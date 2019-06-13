@@ -1,0 +1,31 @@
+---
+osprey:
+    version:
+        - 3.0
+        - latest
+    capabilities:
+        - approximate K_a
+        - calculate partition function
+    osprey-3.0:
+        algorithms:
+            - kstar:
+                  needs:
+                      - pdb
+                      - epsilon
+                      - protein
+                      - ligand
+                      - verbosity
+                      - stdout
+                      - stderr
+                      - mutable_residues
+                      - flexible_residues
+            - partition_function:
+                  needs:
+                      - pdb
+                      - epsilon
+                      - protein
+                      - verbosity
+                      - stdout
+                      - stderr
+                      - mutable_residues
+                      - flexible_residues
