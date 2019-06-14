@@ -3,7 +3,7 @@ import urwid
 from osprey_design import navigation
 from osprey_design.globals import ATTR_BUTTON_NORMAL, ATTR_BUTTON_SELECT
 from .affinity_design import AffinityDesign
-from .stability_design import StabilityDesign
+from .stability_design_page import StabilityDesignPage
 
 
 class StartPage(urwid.Filler):
@@ -30,7 +30,7 @@ class StartPage(urwid.Filler):
     def okay_clicked(self, button):
         next_page_map = {
             self.affinity: AffinityDesign,
-            self.stability: StabilityDesign
+            self.stability: StabilityDesignPage
         }
 
         next_page = next_page_map[self.selected_design]()

@@ -16,8 +16,9 @@ Sphinx = "*"
 twine = "*"
 
 [packages]
-osprey_design = {path = ".", editable = true}
+osprey_design = {path = ".",editable = true}
 click = "*"
 urwid = "*"
 ruamel-yaml = "*"
 libprot = "*"
+yaml = "*"

@@ -20,7 +20,7 @@ class StabilityModel:
         self.design_name = ''
 
 
-class StabilityDesign(urwid.Filler):
+class StabilityDesignPage(urwid.Filler):
 
     @property
     def selected_file(self):
