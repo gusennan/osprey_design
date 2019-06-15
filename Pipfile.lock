@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "2d3ca35b247ade59c4b5235ea45412a141aad5cb560b129faea37116bad82b02"
+            "sha256": "c50089ac2cf37d3c587b14e969ea5cc127d94a37b26d1865033f189483e4038a"
         },
         "pipfile-spec": 6,
         "requires": {},
@@ -54,11 +54,8 @@
             "version": "==7.0"
         },
         "libprot": {
-            "hashes": [
-                "sha256:19279a528ff84fffea92ecd9668105916b39a9557044e429d5b296a9886af8d1",
-                "sha256:259c4762cc79ea3cd97c5b0f82075919cc9bff9a8d8fe07ca1e4cb663847e6b0"
-            ],
-            "version": "==0.1.0"
+            "editable": true,
+            "path": "/home/nsg/code/libprot"
         },
         "numpy": {
             "hashes": [

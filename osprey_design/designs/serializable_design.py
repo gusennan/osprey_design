@@ -1,7 +1,8 @@
 class SerializableDesign:
 
-    def to_yaml(self):
+    def serialize(self):
         raise NotImplementedError()
 
-    def from_yaml(self, serialization: str):
+    @staticmethod
+    def deserialize(serialization: str):
         raise NotImplementedError()

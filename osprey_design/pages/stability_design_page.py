@@ -62,8 +62,7 @@ class StabilityDesignPage(urwid.Filler):
         osprey_30 = urwid.RadioButton(rb_group, OSPREY_30, on_state_change=self.osprey_version_changed)
         osprey_21 = urwid.RadioButton(rb_group, OSPREY_21, on_state_change=self.osprey_version_changed)
 
-        name_design_q = urwid.Text('Give a name to this design:')
-        edit = urwid.Edit()
+        edit = urwid.Edit(' Give a name to this design: ')
         urwid.connect_signal(edit, 'change', self.design_name_changed)
         self._design_name_attr_map = urwid.AttrMap(edit, ATTR_EDIT_NORMAL, ATTR_EDIT_SELECT)
 
@@ -82,7 +81,6 @@ class StabilityDesignPage(urwid.Filler):
             osprey_30,
             osprey_21,
             div,
-            name_design_q,
             self._design_name_attr_map,
             div,
             select_pdb_q,

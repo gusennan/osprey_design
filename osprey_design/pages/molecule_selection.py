@@ -3,7 +3,7 @@ from libprot.pdb import ResidueModifier, Flexibility, AminoAcid, get_amino_acids
 
 from osprey_design import navigation
 from osprey_design.globals import ATTR_WHITE_BG, ATTR_DARK_RED_BG, ATTR_DARK_BLUE_BG, ATTR_DARK_GREEN_BG, ATTR_FOOTER, \
-    ATTR_BLACK_BG
+    ATTR_BLACK_BG, calc_btn_label_width
 from .save_design_page import SaveDesignPage
 
 
@@ -34,16 +34,15 @@ class UseStructureRotamerToggler(BackgroundToggler):
 
 class AminoAcidButton(urwid.Button):
     def __init__(self, res_mod: ResidueModifier):
-        super().__init__('')
 
+        super().__init__('')
         chain = res_mod.identity.chain
         name = res_mod.identity.aa_type.name
         number = res_mod.identity.res_num
 
         self.button_label = f'{chain}| {name} {number}'
-        self._w = urwid.AttrMap(urwid.SelectableIcon(
-            [f' \N{BULLET} {self.button_label}'], 3
-        ), None, ATTR_WHITE_BG)
+        self._w = urwid.AttrMap(urwid.SelectableIcon([f' \N{BULLET} {self.button_label}'], 3 ),
+                                ATTR_WHITE_BG, ATTR_BLACK_BG)
 
 
 class ResidueModView(urwid.Pile):
@@ -75,7 +74,7 @@ class ResidueModView(urwid.Pile):
 
         question_text = urwid.Text((ATTR_DARK_RED_BG, 'To which amino acids should this residue be able to mutate to?'))
         self._checkboxes = [urwid.CheckBox(aa.name, on_state_change=self.residue_mutability_changed, user_data=aa,
-                                           state=self.make_initial_checkbox_state(aa)) for aa in AminoAcid]
+                                           state=self.make_initial_checkbox_state(aa)) for aa in AminoAcid if aa != residue_mod.identity.aa_type]
         gridflow = urwid.GridFlow(self._checkboxes, 16, h_sep=1, v_sep=1, align='left')
         mutability_views.append(('pack', question_text))
         filler = urwid.Filler(gridflow, valign='top')
@@ -120,7 +119,7 @@ class MoleculeSelection(urwid.Columns):
         self._residue_mods = [ResidueModifier(aa) for aa in amino_acids]
 
         self._buttons = [AminoAcidButton(res_mod) for res_mod in self._residue_mods]
-        self._max_label_width = max(len(btn.button_label) for btn in self._buttons) + 4
+        self._max_label_width = max(calc_btn_label_width(btn) for btn in self._buttons)
 
         rows = []
         for button, res_mod in zip(self._buttons, self._residue_mods):
@@ -147,7 +146,7 @@ class MoleculeSelection(urwid.Columns):
             navigation.push_page(SaveDesignPage())
             return
 
-        super().keypress(size, key)
+        return super().keypress(size, key)
 
     def focused_amino_acid_changed(self, new_idx):
         self._current_button._w.set_attr_map({None: ATTR_WHITE_BG})

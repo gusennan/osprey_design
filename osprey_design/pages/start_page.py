@@ -1,7 +1,7 @@
 import urwid
 
 from osprey_design import navigation
-from osprey_design.globals import ATTR_BUTTON_NORMAL, ATTR_BUTTON_SELECT
+from osprey_design.globals import ATTR_BUTTON_NORMAL, ATTR_BUTTON_SELECT, calc_btn_label_width
 from .affinity_design import AffinityDesign
 from .stability_design_page import StabilityDesignPage
 
@@ -17,7 +17,7 @@ class StartPage(urwid.Filler):
         self.selected_design = self.stability
 
         btn = urwid.AttrMap(urwid.Button(' Okay ', on_press=self.okay_clicked), ATTR_BUTTON_NORMAL, ATTR_BUTTON_SELECT)
-        okay_button = urwid.Padding(btn, align='center', width=len(btn.base_widget.label) + 4)
+        okay_button = urwid.Padding(btn, align='center', width=calc_btn_label_width(btn))
 
         content = urwid.Pile([question, div, self.stability, self.affinity, div, okay_button])
         body = urwid.Padding(content, align='right', width=('relative', 80))

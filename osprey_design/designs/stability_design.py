@@ -1,52 +1,53 @@
+import typing
 from io import StringIO
 
-from libprot.pdb import ResidueModifier
-from ruamel import yaml
+import ruamel.yaml
 
+from libprot.pdb import ResidueModifier
+from . import _yaml
 from .serializable_design import SerializableDesign
 
 
+@ruamel.yaml.yaml_object(_yaml)
 class StabilityDesign(SerializableDesign):
-    _yaml = yaml.YAML()
-
-    @property
-    def osprey_version(self):
-        return self._osprey_version
-
-    @osprey_version.setter
-    def osprey_version(self, new_ver):
-        self._osprey_version = new_ver
-
-    @property
-    def design_name(self):
-        return self._design_name
-
-    @design_name.setter
-    def design_name(self, new_name):
-        self._design_name = new_name
-
-    def add_residue_mod(self, residue_mod: ResidueModifier):
-        self._residue_configurations.append(residue_mod)
+    osprey_version: str
+    design_name: str = ''
+    residue_configurations: typing.Set[ResidueModifier] = set()
+    pdb_file: str = ''
+    epsilon: float = 0.0
 
     def __init__(self):
-        self._osprey_version: str = ''
-        self._design_name: str = ''
-        self._residue_configurations: [ResidueModifier] = []
-        self._pdb_file: str = ''
-        self._epsilon: float = 0.63
+        self.osprey_version: str = ''
+        self.design_name: str = ''
+        self.residue_configurations: typing.Set[ResidueModifier] = set()
+        self.pdb_file: str = ''
+        self.epsilon: float = 0.0
 
-        self._yaml = yaml.YAML()
-        self._yaml.register_class(type(self))
+    def __eq__(self, other):
+        if not isinstance(other, type(self)):
+            return False
 
-    def to_yaml(self) -> str:
-        yaml = yaml.YAML()
-        yaml.register_class(type(self))
+        return self.osprey_version == other.osprey_version \
+               and self.design_name == other.design_name \
+               and self.pdb_file == other.pdb_file \
+               and self.epsilon == other.epsilon \
+               and self.residue_configurations == other.residue_configurations
 
+    def serialize(self) -> str:
         buffer = StringIO()
-        yaml.dump([self], stream=buffer)
+        _yaml.dump(self, buffer)
         return buffer.getvalue()
 
-    def from_yaml(self, serialization: str):
+    @staticmethod
+    def deserialize(serialization: str) -> 'StabilityDesign':
+        return _yaml.load(serialization)
 
-        buffer = StringIO(serialization)
-        instance = self._yaml.load(buffer)
+    def __copy__(self):
+        sd = StabilityDesign()
+        sd.osprey_version = self.osprey_version
+        sd.design_name = self.design_name
+        sd.residue_configurations = self.residue_configurations.copy()
+        sd.pdb_file = self.pdb_file
+        sd.epsilon = self.epsilon
+
+        return sd
