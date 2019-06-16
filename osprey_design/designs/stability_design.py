@@ -27,11 +27,11 @@ class StabilityDesign(SerializableDesign):
         if not isinstance(other, type(self)):
             return False
 
-        return self.osprey_version == other.osprey_version \
-               and self.design_name == other.design_name \
-               and self.pdb_file == other.pdb_file \
-               and self.epsilon == other.epsilon \
-               and self.residue_configurations == other.residue_configurations
+        return (self.osprey_version == other.osprey_version and
+                self.design_name == other.design_name and
+                self.pdb_file == other.pdb_file and
+                self.epsilon == other.epsilon and
+                self.residue_configurations == other.residue_configurations)
 
     def serialize(self) -> str:
         buffer = StringIO()

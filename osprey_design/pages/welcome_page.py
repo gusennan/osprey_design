@@ -12,8 +12,9 @@ WELCOME_MSG = "Welcome! This program's purpose is to help you specify your OSPRE
 class WelcomePage(urwid.Filler):
     def __init__(self):
         text = urwid.Text(WELCOME_MSG, align='left')
-        btn = urwid.AttrMap(urwid.Button(' Start ', on_press=self.start_btn_pressed), ATTR_BUTTON_NORMAL, ATTR_BUTTON_SELECT)
-        start_btn = urwid.Padding(btn, align='right', width=calc_btn_label_width(btn.base_widget))
+        btn = urwid.Button(' Start ', on_press=self.start_btn_pressed)
+        wrapped_btn = urwid.AttrMap(btn, ATTR_BUTTON_NORMAL, ATTR_BUTTON_SELECT)
+        start_btn = urwid.Padding(wrapped_btn, align='right', width=calc_btn_label_width(wrapped_btn.base_widget))
         div = urwid.Divider()
         content = urwid.Pile([text, div, start_btn])
         body = urwid.Padding(content, 'center', 80)

@@ -41,7 +41,7 @@ class AminoAcidButton(urwid.Button):
         number = res_mod.identity.res_num
 
         self.button_label = f'{chain}| {name} {number}'
-        self._w = urwid.AttrMap(urwid.SelectableIcon([f' \N{BULLET} {self.button_label}'], 3 ),
+        self._w = urwid.AttrMap(urwid.SelectableIcon([f' \N{BULLET} {self.button_label}'], 3),
                                 ATTR_WHITE_BG, ATTR_BLACK_BG)
 
 
@@ -74,7 +74,8 @@ class ResidueModView(urwid.Pile):
 
         question_text = urwid.Text((ATTR_DARK_RED_BG, 'To which amino acids should this residue be able to mutate to?'))
         self._checkboxes = [urwid.CheckBox(aa.name, on_state_change=self.residue_mutability_changed, user_data=aa,
-                                           state=self.make_initial_checkbox_state(aa)) for aa in AminoAcid if aa != residue_mod.identity.aa_type]
+                                           state=self.make_initial_checkbox_state(aa))
+                            for aa in AminoAcid if aa != residue_mod.identity.aa_type]
         gridflow = urwid.GridFlow(self._checkboxes, 16, h_sep=1, v_sep=1, align='left')
         mutability_views.append(('pack', question_text))
         filler = urwid.Filler(gridflow, valign='top')

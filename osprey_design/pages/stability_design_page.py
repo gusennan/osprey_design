@@ -5,8 +5,8 @@ import urwid
 from libprot.pdb import is_pdb_file
 
 from osprey_design import navigation
-from osprey_design.globals import calc_btn_label_width, ATTR_EDIT_SELECT, ATTR_EDIT_NORMAL, ATTR_BUTTON_NORMAL, ATTR_BUTTON_SELECT, \
-    ATTR_QUESTION
+from osprey_design.globals import calc_btn_label_width, ATTR_EDIT_SELECT, ATTR_EDIT_NORMAL, ATTR_BUTTON_NORMAL, \
+    ATTR_BUTTON_SELECT, ATTR_QUESTION
 from .molecule_selection import MoleculeSelection
 from .browse import DirectoryBrowser
 

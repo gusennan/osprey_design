@@ -5,8 +5,10 @@ import sys
 import click
 
 from osprey_design import navigation
+from osprey_design.globals import ATTR_BUTTON_NORMAL, ATTR_BUTTON_SELECT, ATTR_HEADER, ATTR_FOOTER, ATTR_EDIT_NORMAL, \
+    ATTR_EDIT_SELECT, ATTR_QUESTION, ATTR_WHITE_BG, ATTR_BLACK_BG, ATTR_DARK_RED_BG, ATTR_DARK_GREEN_BG, \
+    ATTR_DARK_BLUE_BG
 from osprey_design.pages.welcome_page import WelcomePage
-from .globals import *
 
 
 @click.command()

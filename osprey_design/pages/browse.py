@@ -42,7 +42,10 @@ from osprey_design.globals import ATTR_FOOTER, ATTR_HEADER
 
 _flagged_files = []
 _max_selectable = -1
-_on_selection_changed = lambda x, y: None
+
+
+def _on_selection_changed(x, y):
+    return None
 
 
 class FlagFileWidget(urwid.TreeWidget):
@@ -221,7 +224,7 @@ class DirectoryNode(urwid.ParentNode):
                     dirs.append(a)
                 else:
                     files.append(a)
-        except OSError as e:
+        except OSError:
             depth = self.get_depth() + 1
             self._children[None] = ErrorNode(self, parent=self, key=None,
                                              depth=depth)
@@ -351,11 +354,11 @@ def add_widget(path, widget):
 def get_flagged_names():
     """Return a list of all filenames marked as flagged."""
 
-    l = []
+    flagged_files = []
     for w in _widget_cache.values():
         if w.flagged:
-            l.append(w.get_node().get_value())
-    return l
+            flagged_files.append(w.get_node().get_value())
+    return flagged_files
 
 
 ######
@@ -373,14 +376,14 @@ def store_initial_cwd(name):
 def starts_expanded(name):
     """Return True if directory is a parent of initial cwd."""
 
-    if name is '/':
+    if name == '/':
         return True
 
-    l = name.split(dir_sep())
-    if len(l) > len(_initial_cwd):
+    parts = name.split(dir_sep())
+    if len(parts) > len(_initial_cwd):
         return False
 
-    if l != _initial_cwd[:len(l)]:
+    if parts != _initial_cwd[:len(parts)]:
         return False
 
     return True
