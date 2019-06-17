@@ -1,5 +1,8 @@
+import copy
+
 import urwid
 from libprot.pdb import ResidueModifier, Flexibility, AminoAcid, get_amino_acids
+from io import StringIO
 
 from osprey_design import navigation
 from osprey_design.globals import ATTR_WHITE_BG, ATTR_DARK_RED_BG, ATTR_DARK_BLUE_BG, ATTR_DARK_GREEN_BG, ATTR_FOOTER, \
@@ -40,8 +43,8 @@ class AminoAcidButton(urwid.Button):
         name = res_mod.identity.aa_type.name
         number = res_mod.identity.res_num
 
-        self.button_label = f'{chain}| {name} {number}'
-        self._w = urwid.AttrMap(urwid.SelectableIcon([f' \N{BULLET} {self.button_label}'], 3),
+        self.set_label(f'{chain}| {name} {number}')
+        self._w = urwid.AttrMap(urwid.SelectableIcon([f' \N{BULLET} {self.label}'], 3),
                                 ATTR_WHITE_BG, ATTR_BLACK_BG)
 
 
@@ -55,15 +58,15 @@ class ResidueModView(urwid.Pile):
         self._rotamer_radio_btns = []
 
         bool_qs = [
-            ((ATTR_DARK_BLUE_BG,
-              "Flexibility of the residue: Should the sidechain be able to switch rotameric conformation?"),
+            (ATTR_DARK_BLUE_BG,
+             "Flexibility of the residue: Should the sidechain be able to switch rotameric conformation?",
              self.residue_flexibility_changed, self._flex_radio_btns, residue_mod.flexibility.is_flexible),
-            ((ATTR_DARK_GREEN_BG, "Should the structure's romtamers be included?"), self.residue_flexibility_changed,
+            (ATTR_DARK_GREEN_BG, "Should the structure's romtamers be included?", self.residue_flexibility_changed,
              self._rotamer_radio_btns, residue_mod.flexibility.include_structure_rotamer)
         ]
 
-        for markup, callback, group, enabled in bool_qs:
-            question_text = urwid.Text(markup)
+        for attr, text, callback, group, enabled in bool_qs:
+            question_text = urwid.AttrMap(urwid.Text((attr, text)), attr)
             flexibility_views.append(('pack', question_text))
 
             yes_btn = urwid.RadioButton(group, 'Yes', on_state_change=callback, state=enabled)
@@ -72,7 +75,9 @@ class ResidueModView(urwid.Pile):
             filler = urwid.Filler(columns, valign='top')
             flexibility_views.append(filler)
 
-        question_text = urwid.Text((ATTR_DARK_RED_BG, 'To which amino acids should this residue be able to mutate to?'))
+        question_text = urwid.AttrMap(urwid.Text((ATTR_DARK_RED_BG,
+                                                  'To which amino acids should this residue be able to mutate to?')),
+                                      ATTR_DARK_RED_BG)
         self._checkboxes = [urwid.CheckBox(aa.name, on_state_change=self.residue_mutability_changed, user_data=aa,
                                            state=self.make_initial_checkbox_state(aa))
                             for aa in AminoAcid if aa != residue_mod.identity.aa_type]
@@ -108,17 +113,16 @@ class ResidueModView(urwid.Pile):
             self._residue_mod.remove_target_mutable(user_data)
 
 
-class MoleculeSelection(urwid.Columns):
+class MoleculeSelectionPage(urwid.Columns):
     left_pane = 0
     right_pane = 1
 
-    def __init__(self, pdb_file):
+    def __init__(self, pdb_file: str, model):
         self.pdb_file = pdb_file
+        self.model = model
         self.footer = urwid.Text((ATTR_FOOTER, f'Using PDB file f{self.pdb_file}'))
-        amino_acids = get_amino_acids(pdb_file)
-
+        amino_acids = get_amino_acids(StringIO(model.molecule))
         self._residue_mods = [ResidueModifier(aa) for aa in amino_acids]
-
         self._buttons = [AminoAcidButton(res_mod) for res_mod in self._residue_mods]
         self._max_label_width = max(calc_btn_label_width(btn) for btn in self._buttons)
 
@@ -143,8 +147,11 @@ class MoleculeSelection(urwid.Columns):
         navigation.add_additional_key_option('S to save')
 
     def keypress(self, size, key):
+        cpy = copy.copy(self.model)
+        cpy.residue_configurations = [rm for rm in self._residue_mods if not rm.is_default()]
+
         if key == 'S':
-            navigation.push_page(SaveDesignPage())
+            navigation.push_page(SaveDesignPage(cpy))
             return
 
         return super().keypress(size, key)

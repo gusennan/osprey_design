@@ -17,7 +17,7 @@ class StartPage(urwid.Filler):
         self.selected_design = self.stability
 
         btn = urwid.AttrMap(urwid.Button(' Okay ', on_press=self.okay_clicked), ATTR_BUTTON_NORMAL, ATTR_BUTTON_SELECT)
-        okay_button = urwid.Padding(btn, align='center', width=calc_btn_label_width(btn))
+        okay_button = urwid.Padding(btn, align='center', width=calc_btn_label_width(btn.base_widget))
 
         content = urwid.Pile([question, div, self.stability, self.affinity, div, okay_button])
         body = urwid.Padding(content, align='right', width=('relative', 80))

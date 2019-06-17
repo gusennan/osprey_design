@@ -20,4 +20,4 @@ osprey_design = {path = ".",editable = true}
 click = "*"
 urwid = "*"
 ruamel-yaml = "*"
-libprot = {path = '/home/nsg/code/libprot', editable=true}
+libprot = "==0.1.2"

@@ -5,19 +5,14 @@ import urwid
 from libprot.pdb import is_pdb_file
 
 from osprey_design import navigation
+from osprey_design.designs.stability_design import StabilityDesign
 from osprey_design.globals import calc_btn_label_width, ATTR_EDIT_SELECT, ATTR_EDIT_NORMAL, ATTR_BUTTON_NORMAL, \
     ATTR_BUTTON_SELECT, ATTR_QUESTION
-from .molecule_selection import MoleculeSelection
+from .molecule_selection_page import MoleculeSelectionPage
 from .browse import DirectoryBrowser
 
 OSPREY_21 = 'Osprey 2.1'
 OSPREY_30 = 'Osprey 3.0'
-
-
-class StabilityModel:
-    def __init__(self):
-        self.osprey_version = OSPREY_30
-        self.design_name = ''
 
 
 class StabilityDesignPage(urwid.Filler):
@@ -36,11 +31,14 @@ class StabilityDesignPage(urwid.Filler):
             self._file_selected_attr_map.original_widget.set_text('Warning: file selected is not a PDB.')
 
     def __init__(self):
-        self.model = StabilityModel()
+        self.model: StabilityDesign = StabilityDesign()
+        self.model.osprey_version = OSPREY_30
+        self.model.epsilon = 0.63
         self._selected_file = ''
         self._file_selected_attr_map = urwid.AttrMap(urwid.Text('(No file selected)'), {})
         self._valid_pdb_selected = False
         self._design_name_attr_map = None
+        self._epsilon_attr_map = None
         self._contents = None
         body = self.create_view()
         super().__init__(body)
@@ -66,6 +64,10 @@ class StabilityDesignPage(urwid.Filler):
         urwid.connect_signal(edit, 'change', self.design_name_changed)
         self._design_name_attr_map = urwid.AttrMap(edit, ATTR_EDIT_NORMAL, ATTR_EDIT_SELECT)
 
+        epsilon = urwid.Edit(' Epsilon (accuracy = 1 - epsilon): ', str(self.model.epsilon))
+        urwid.connect_signal(epsilon, 'postchange', self.epsilon_changed)
+        self._epsilon_attr_map = urwid.AttrMap(epsilon, ATTR_EDIT_NORMAL, ATTR_EDIT_SELECT)
+
         select_pdb_q = urwid.Text('Select a PDB file with the molecule')
         btn = urwid.Button(' Select ', on_press=self.open_file_browser)
         select_pdb_btn = urwid.Padding(urwid.AttrMap(btn, ATTR_BUTTON_NORMAL, ATTR_BUTTON_SELECT), align='right',
@@ -82,6 +84,8 @@ class StabilityDesignPage(urwid.Filler):
             osprey_21,
             div,
             self._design_name_attr_map,
+            div,
+            self._epsilon_attr_map,
             div,
             select_pdb_q,
             select_pdb_btn,
@@ -100,6 +104,18 @@ class StabilityDesignPage(urwid.Filler):
     def design_name_changed(self, edit, text):
         self.model.design_name = text
 
+    def epsilon_changed(self, edit, old_text):
+        new_text: str = edit.edit_text
+        if new_text == old_text:  # programmatically changed the text
+            return
+        elif not new_text:
+            self.model.epsilon = 0
+        else:
+            try:
+                self.model.epsilon = float(new_text)
+            except ValueError:
+                edit.edit_text = old_text
+
     def open_file_browser(self, button):
         browser = DirectoryBrowser(max_selectable=1, file_selection_changed=self.on_file_selection_changed)
         navigation.get_loop().screen.register_palette(browser.palette)
@@ -110,10 +126,14 @@ class StabilityDesignPage(urwid.Filler):
             self._valid_pdb_selected = is_pdb_file(file_path)
             self.selected_file = file_path if self._valid_pdb_selected else None
 
+        if self._valid_pdb_selected:
+            with open(self.selected_file) as f:
+                self.model.set_molecule(f.read())
+
     def set_protein_params(self, button):
         errors = self.validate_setup()
         if not errors:
-            navigation.push_page(MoleculeSelection(self.selected_file))
+            navigation.push_page(MoleculeSelectionPage(self.selected_file, self.model))
             return
 
         for am in errors:

@@ -16,3 +16,6 @@ ATTR_FOOTER = 'footer'
 
 def calc_btn_label_width(btn: urwid.Button):
     return len(btn.label) + 4
+
+
+design_path = ''
