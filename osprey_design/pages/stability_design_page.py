@@ -2,7 +2,7 @@ import threading
 from typing import List
 
 import urwid
-from libprot.pdb import is_pdb_file
+from libprot.pdb import is_pdb_file, run_reduce
 
 from osprey_design import navigation
 from osprey_design.designs.stability_design import StabilityDesign
@@ -128,7 +128,8 @@ class StabilityDesignPage(urwid.Filler):
 
         if self._valid_pdb_selected:
             with open(self.selected_file) as f:
-                self.model.set_molecule(f.read())
+                _, std_out, _ = run_reduce(f)
+                self.model.set_molecule(std_out.read())
 
     def set_protein_params(self, button):
         errors = self.validate_setup()
